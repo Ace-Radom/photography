@@ -1,0 +1,151 @@
+/* =========================================
+    1. 全局与现代化 CSS 变量定义
+    ========================================= */
+    :root {
+    --bg-color: #f0f2f5;        /* 整体网页背景 */
+    --panel-bg: #ffffff;        /* 面板(父容器)背景 */
+    --card-bg: #f8fafc;         /* 卡片背景(极浅的灰蓝色) */
+    --border-color: #e2e8f0;    /* 统一的边框颜色 */
+    --text-main: #2d3748;       
+    --text-sub: #718096;        
+    --accent-color: #4299e1;    
+    --radius-sm: 10px;          /* 卡片小圆角 (调小) */
+    --radius-lg: 20px;          /* 面板大圆角 (调小) */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 20px; /* 【减小】整个页面的外边距 (原30px) */
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden; 
+}
+
+/* =========================================
+    2. 整体布局
+    ========================================= */
+.layout-container {
+    display: flex;
+    gap: 15px; /* 【减小】左右两侧面板的间距 (原30px) */
+    height: 100%;
+    max-width: 1600px; 
+    margin: 0 auto;
+}
+
+/* =========================================
+    3. 左侧：增加边框的父对象面板
+    ========================================= */
+.photo-sidebar {
+    width: 33%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 【减小】卡片之间的间距 (原15px) */
+    overflow-y: auto;
+    
+    /* 新增：父对象边框与背景样式 */
+    background-color: var(--panel-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 12px; /* 给父容器内部增加紧凑的内边距 */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* 添加轻微阴影呼应右侧 */
+    box-sizing: border-box;
+}
+
+/* 紧凑型滚动条 */
+.photo-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.photo-sidebar::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}
+
+/* =========================================
+    4. 左侧卡片：Bar-style Cards
+    ========================================= */
+.photo-bar {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-bg); /* 改为浅色区分父容器 */
+    border: 1px solid var(--border-color); /* 增加卡片细边框 */
+    border-radius: var(--radius-sm); 
+    padding: 8px; /* 【减小】卡片内部元素与卡片边缘的间距 (原12px) */
+    cursor: pointer;
+    transition: all 0.3s ease; 
+}
+
+.photo-bar:hover, .photo-bar.highlight {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+    border-color: var(--accent-color);
+    background-color: #ffffff;
+}
+
+.photo-bar img {
+    width: 80px;  /* 稍微缩小图片以适应紧凑布局 */
+    height: 60px;
+    object-fit: cover; 
+    border-radius: 6px; 
+}
+
+.photo-bar .info {
+    margin-left: 12px; /* 减小图片和文字的间距 */
+    flex: 1;
+}
+.photo-bar h3 {
+    margin: 0 0 4px 0;
+    font-size: 15px; /* 字体微调 */
+    color: var(--text-main);
+}
+.photo-bar p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+/* =========================================
+    5. 右侧：带阴影的悬浮地图窗口
+    ========================================= */
+.map-wrapper {
+    width: 67%;
+    border-radius: var(--radius-lg); 
+    overflow: hidden; 
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12); /* 阴影稍微收敛，配合紧凑布局 */
+    position: relative;
+    border: 2px solid var(--border-color); /* 增加边框与左侧呼应 */
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================================
+    6. 美化 Leaflet 提示框 (Tooltip)
+    ========================================= */
+/* 覆盖 Leaflet 默认的提示框背景和边框 */
+.leaflet-tooltip.modern-tooltip {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); /* 增加现代感的高级阴影 */
+    color: var(--text-main);
+    font-family: inherit; /* 继承全局字体 */
+    font-size: 14px;
+    padding: 6px 12px;
+    white-space: nowrap; /* 确保文字不换行 */
+    transition: opacity 0.35s ease-in-out !important;
+}
+
+/* 移除默认文字的粗体，让整体看起来更轻盈 */
+.leaflet-tooltip.modern-tooltip b {
+    font-weight: 600;
+}
+
+/* 美化提示框底部的那个小三角形 */
+.leaflet-tooltip-top.modern-tooltip::before {
+    border-top-color: var(--border-color); /* 让小三角形的边框颜色与主体一致 */
+    bottom: 0; /* 修复由于边框带来的轻微缝隙 */
+}
