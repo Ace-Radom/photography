@@ -21,6 +21,36 @@ map.on('baselayerchange', function (e) {
     }
 });
 
+// ==========================================
+// 【新增】：全屏浮窗控制逻辑
+// ==========================================
+const modal = document.getElementById("image-modal");
+const modalImg = document.getElementById("full-size-img");
+const captionText = document.getElementById("caption");
+const closeBtn = document.querySelector(".close-btn");
+
+function openImageModal(url, title) {
+    modalImg.src = url;               // 填入高清图 URL
+    captionText.innerHTML = title;    // 填入标题
+    modal.classList.add("show");      // 触发 CSS 动画显示浮窗
+}
+
+function closeModal() {
+    modal.classList.remove("show");   // 触发 CSS 动画隐藏浮窗
+    // 延迟清除 src，防止旧图在下次打开的瞬间闪烁
+    setTimeout(() => { modalImg.src = ""; }, 350); 
+}
+
+// 绑定关闭事件：点击 X 按钮
+closeBtn.addEventListener('click', closeModal);
+
+// 绑定关闭事件：点击照片外围的空白/模糊背景也能关闭
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        closeModal();
+    }
+});
+
 // 2. 准备全局变量
 let photos = []; // 改为 let，因为数据是后来装进去的
 const markers = {}; 
@@ -50,6 +80,12 @@ function handlePhotoFocus(photo) {
     if (activePhotoId === photo.id && isSameLat && isSameLng && isSameZoom) {
         console.log(`[准备就绪] 触发打开照片大图: ${photo.title}`);
         markers[photo.id].openTooltip();
+
+        // ==========================================
+        // 【核心连结】：在这里调用刚写好的开窗函数！
+        // ==========================================
+        openImageModal(photo.fullUrl, photo.title);
+
         return; 
     }
 

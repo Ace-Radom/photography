@@ -1,7 +1,7 @@
 /* =========================================
     1. 全局与现代化 CSS 变量定义
     ========================================= */
-    :root {
+:root {
     --bg-color: #f0f2f5;        /* 整体网页背景 */
     --panel-bg: #ffffff;        /* 面板(父容器)背景 */
     --card-bg: #f8fafc;         /* 卡片背景(极浅的灰蓝色) */
@@ -148,4 +148,89 @@ body {
 .leaflet-tooltip-top.modern-tooltip::before {
     border-top-color: var(--border-color); /* 让小三角形的边框颜色与主体一致 */
     bottom: 0; /* 修复由于边框带来的轻微缝隙 */
+}
+
+/* =========================================
+    7. 图片全屏查看浮窗 (Modal) 样式
+    ========================================= */
+.modal {
+    display: flex; 
+    visibility: hidden;
+    pointer-events: none; 
+
+    position: fixed; 
+    z-index: 9999; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); 
+    backdrop-filter: blur(8px); 
+
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    opacity: 0;
+    /* visibility 也可以参与过渡，确保淡出动画播完后再隐藏 */
+    transition: opacity 0.35s ease, visibility 0.35s ease; 
+}
+
+/* 当获得 show 类时，恢复可见和可点击 */
+.modal.show {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* 承载大图的 img 标签样式 */
+.modal-content {
+    max-width: 90%;
+    max-height: 80vh;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
+    
+    /* ==========================================
+       【核心新增】：初始状态设定为缩小到 70% (scale(0.7)) 且全透明
+       ========================================== */
+    transform: scale(0.7);
+    opacity: 0;
+    
+    /* 设置平滑过渡动画：
+       0.35s 是时间
+       cubic-bezier 是一条特殊的贝塞尔曲线，能制造出微微的“Q弹”回弹感
+    */
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease;
+}
+
+/* ==========================================
+   【核心新增】：当父级浮窗获得 'show' 类时，内部图片放大回 100% 并完全显现
+   ========================================== */
+.modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+#caption {
+    margin-top: 20px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: var(--accent-color); /* 鼠标悬停变蓝 */
 }
