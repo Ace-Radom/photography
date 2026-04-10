@@ -41,7 +41,6 @@ body {
     width: 33%;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* 【减小】卡片之间的间距 (原15px) */
     overflow-y: auto;
     
     /* 新增：父对象边框与背景样式 */
@@ -60,6 +59,15 @@ body {
 .photo-sidebar::-webkit-scrollbar-thumb {
     background: #cbd5e0;
     border-radius: 10px;
+}
+
+/* =========================================
+    专门为照片列表容器恢复间距
+    ========================================= */
+#photo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* 完美恢复你想要的卡片间距 */
 }
 
 /* =========================================
@@ -191,22 +199,12 @@ body {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     object-fit: contain;
     
-    /* ==========================================
-       【核心新增】：初始状态设定为缩小到 70% (scale(0.7)) 且全透明
-       ========================================== */
     transform: scale(0.7);
     opacity: 0;
     
-    /* 设置平滑过渡动画：
-       0.35s 是时间
-       cubic-bezier 是一条特殊的贝塞尔曲线，能制造出微微的“Q弹”回弹感
-    */
     transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease;
 }
 
-/* ==========================================
-   【核心新增】：当父级浮窗获得 'show' 类时，内部图片放大回 100% 并完全显现
-   ========================================== */
 .modal.show .modal-content {
     transform: scale(1);
     opacity: 1;
@@ -233,4 +231,73 @@ body {
 
 .close-btn:hover {
     color: var(--accent-color); /* 鼠标悬停变蓝 */
+}
+
+/* =========================================
+    8. 版权页脚 (Footer) 样式
+    ========================================= */
+.site-footer {
+    /* 移除宽度的强制限制和背景色，让它自然融入左侧面板 */
+    background-color: transparent; 
+    border-top: 1px dashed var(--border-color); /* 改为虚线，显得更轻盈 */
+    padding: 20px 5px 10px;
+    margin-top: 15px; /* 与上方最后一张照片卡片拉开距离 */
+    text-align: center;
+    font-family: inherit;
+    position: relative;
+}
+
+.footer-content {
+    max-width: 800px; /* 限制居中宽度，阅读体验更好 */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 段落之间的温和间距 */
+}
+
+.site-copyright {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main, #2d3748);
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.photo-copyright {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #e53e3e; /* 使用低饱和度的红色，警示但不刺眼 */
+    background-color: #fff5f5; /* 极淡的红色背景，强调不可侵犯 */
+    padding: 10px;
+    border-radius: var(--radius-sm, 8px);
+    margin: 0;
+}
+
+.license-info {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-sub, #718096);
+    line-height: 1.5;
+}
+
+.license-info a {
+    color: var(--accent-color, #4299e1);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.license-info a:hover {
+    color: #2b6cb0;
+    text-decoration: underline;
+}
+
+.license-info img {
+    vertical-align: middle;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+    margin-bottom: 6px;
+}
+
+.license-info img:hover {
+    opacity: 1;
 }
