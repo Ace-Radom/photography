@@ -42,6 +42,7 @@ map.on('baselayerchange', function (e) {
 
     if (photos.length > 0) {
         photos.forEach(photo => preloadMapTiles(photo.lat, photo.lng, targetZoomLevel));
+        preloadMacroMap(photos);
     } // call new preload
 }); // listen map layer changes
 
@@ -131,24 +132,51 @@ function handlePhotoFocus(photo) {
     } // normal fly-to
 }
 
-function preloadMapTiles(lat, lng, zoom) {
+function latLngToTile(lat, lng, zoom) {
     const x = Math.floor((lng + 180) / 360 * Math.pow(2, zoom));
     const y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+    return { x, y };
+}
+
+function preloadMapTileImg(x, y, zoom) {
+    const tileData = {
+        x: x,
+        y: y,
+        z: zoom,
+        s: activeLayer._getSubdomain ? activeLayer._getSubdomain({ x: x, y: y }) : 'a',
+        r: L.Browser.retina ? '@2x' : ''
+    };
+    const tileUrl = L.Util.template(activeLayer._url, L.extend({}, activeLayer.options, tileData));
+    const img = new Image();
+    img.src = tileUrl;
+}
+
+function preloadMapTiles(lat, lng, zoom) {
+    const tile = latLngToTile(lat, lng, zoom);
 
     for (let i = -2; i <= 2; i++) {
         for (let j = -2; j <= 2; j++) {
-            const tileData = {
-                x: x + i,
-                y: y + j,
-                z: zoom,
-                s: activeLayer._getSubdomain ? activeLayer._getSubdomain({ x: x + i, y: y + j }) : 'a',
-                r: L.Browser.retina ? '@2x' : ''
-            };
-            
-            const tileUrl = L.Util.template(activeLayer._url, L.extend({}, activeLayer.options, tileData));
-            
-            const img = new Image();
-            img.src = tileUrl;
+            preloadMapTileImg(tile.x + i, tile.y + j, zoom);
+        }
+    }
+}
+
+function preloadMacroMap(photosList) {
+    if (!photosList || photosList.length === 0) return;
+
+    const latLngs = photosList.map(p => L.latLng(p.lat, p.lng));
+    const bounds = L.latLngBounds(latLngs);
+    const macroZoom = Math.max(1, map.getBoundsZoom(bounds) - 1);
+
+    const northWest = bounds.getNorthWest();
+    const southEast = bounds.getSouthEast();
+
+    const nwTile = latLngToTile(northWest.lat, northWest.lng, macroZoom);
+    const seTile = latLngToTile(southEast.lat, southEast.lng, macroZoom);
+
+    for (let x = nwTile.x; x <= seTile.x; x++) {
+        for (let y = nwTile.y; y <= seTile.y; y++) {
+            preloadMapTileImg(x, y, macroZoom);
         }
     }
 }
@@ -159,7 +187,7 @@ async function initGallery() {
         const response = await fetch(jsonUrl);
 
         if (!response.ok) {
-            throw new Error(`网络响应不正常，状态码: ${response.status}`);
+            throw new Error(`网络响应异常，状态码: ${response.status}`);
         }
 
         photos = await response.json();
@@ -223,6 +251,7 @@ async function initGallery() {
 
         setTimeout(() => {
             photos.forEach(photo => preloadMapTiles(photo.lat, photo.lng, targetZoomLevel));
+            preloadMacroMap(photos);
         }, 1500);
         // delayed preload
     } catch (error) {
