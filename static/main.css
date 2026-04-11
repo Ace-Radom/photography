@@ -255,6 +255,24 @@ body {
     gap: 12px; /* 段落之间的温和间距 */
 }
 
+/* =========================================
+   【新增】页脚导航图标样式
+   ========================================= */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* 图标之间的间距 */
+    margin-bottom: -4px; /* 与下方版权信息的额外间距 */
+}
+
+.social-links a {
+    color: var(--text-sub);
+} /* 默认灰蓝色 */
+
+.social-links a:hover {
+    color: var(--accent-color);
+} /* 悬停亮蓝色 */
+
 .site-copyright {
     font-size: 14px;
     font-weight: 600;
