@@ -135,17 +135,27 @@ function preloadMapTiles(lat, lng, zoom) {
     const x = Math.floor((lng + 180) / 360 * Math.pow(2, zoom));
     const y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
 
-    for (let i = -1; i <= 1; i++) {
-        for (let j = -1; j <= 1; j++) {
+    for (let i = -2; i <= 2; i++) {
+        for (let j = -2; j <= 2; j++) {
+            const tileData = {
+                x: x + i,
+                y: y + j,
+                z: zoom,
+                s: activeLayer._getSubdomain ? activeLayer._getSubdomain({ x: x + i, y: y + j }) : 'a',
+                r: L.Browser.retina ? '@2x' : ''
+            };
+            
+            const tileUrl = L.Util.template(activeLayer._url, L.extend({}, activeLayer.options, tileData));
+            
             const img = new Image();
-            img.src = activeLayer.getTileUrl({ x: x + i, y: y + j, z: zoom });
+            img.src = tileUrl;
         }
     }
 }
 
 async function initGallery() {
     try {
-        const jsonUrl = './assets/meta.json';
+        const jsonUrl = (isLocalDev) ? './assets/meta.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/meta.json';
         const response = await fetch(jsonUrl);
 
         if (!response.ok) {
