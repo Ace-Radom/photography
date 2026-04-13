@@ -183,14 +183,24 @@ function preloadMacroMap(photosList) {
 
 async function initGallery() {
     try {
-        const jsonUrl = (isLocalDev) ? './assets/meta.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/meta.json';
-        const response = await fetch(jsonUrl);
+        const metaUrl = (isLocalDev) ? './assets/meta.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/meta.json';
+        const derivativeIconSvgUrl = (isLocalDev) ? './assets/icon-derivative.svg' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/icon-derivative.svg';
 
-        if (!response.ok) {
-            throw new Error(`网络响应异常，状态码: ${response.status}`);
+        const [metaResponse, derivativeIconSvgResponse] = await Promise.all([
+            fetch(metaUrl),
+            fetch(derivativeIconSvgUrl)
+        ]);
+
+        if (!metaResponse.ok) {
+            throw new Error(`数据获取失败，状态码: ${metaResponse.status}`);
+        }
+        if (!derivativeIconSvgResponse.ok) {
+            throw new Error(`图标获取失败，状态码: ${metaResponse.status}`);
         }
 
-        photos = await response.json();
+        let derivativeIconSvgString = await derivativeIconSvgResponse.text();
+
+        photos = await metaResponse.json();
         photos.sort((a, b) => {
             if (b.year !== a.year) return b.year - a.year;
             if (b.month !== a.month) return b.month - a.month;
@@ -267,6 +277,14 @@ async function initGallery() {
             const locationArray = [photo.country, photo.state, photo.city];
             const locationString = locationArray.filter(item => item).join(' · ');
             const dateString = `${photo.year}年${photo.month}月${photo.day}日`;
+            let tag = '';
+            if (photo.type === "derivative") {
+                tag = `
+                <div class="creative-indicator" data-tooltip="这是一幅二创作品">
+                    ${derivativeIconSvgString}
+                </div>
+                `
+            } // derivative work
             barDiv.innerHTML = `
                 <img src="${photo.thumbUrl}" alt="${photo.title}"> 
                 <div class="info">
@@ -274,6 +292,7 @@ async function initGallery() {
                     <p class="location">${locationString}</p>
                     <p class="date">${dateString}</p>
                 </div>
+                ${tag}
             `;
             barDiv.addEventListener('click', () => {
                 handlePhotoFocus(photo);
