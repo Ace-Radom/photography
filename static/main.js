@@ -244,6 +244,11 @@ async function initGallery() {
                 const groupForThisYear = document.createElement('div');
                 groupForThisYear.className = 'year-group';
 
+                const innerWrapper = document.createElement('div');
+                innerWrapper.className = 'year-group-inner';
+                groupForThisYear.appendChild(innerWrapper);
+                // wrapper for show / hide animation
+
                 yearDivider.addEventListener('click', () => {
                     yearDivider.classList.toggle('collapsed');
                     groupForThisYear.classList.toggle('collapsed');
@@ -252,7 +257,7 @@ async function initGallery() {
                 photoListContainer.appendChild(yearDivider);
                 photoListContainer.appendChild(groupForThisYear);
                 lastYear = photo.year;
-                currentYearGroup = groupForThisYear;
+                currentYearGroup = innerWrapper;
             } // update year tag if needed
 
             const barDiv = document.createElement('div');

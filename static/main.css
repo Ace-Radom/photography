@@ -108,13 +108,31 @@ body {
 }
 
 .year-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .year-group.collapsed {
-    display: none;
+    grid-template-rows: 0fr;
+}
+
+.year-group-inner {
+    min-height: 0;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.year-group.collapsed .year-group-inner {
+    opacity: 0;
+    transform: translateY(-20px);
 }
 
 .photo-bar {
