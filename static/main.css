@@ -57,6 +57,49 @@ body {
     gap: 10px;
 }
 
+.year-divider {
+    padding: 15px 5px 5px 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-sub);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 5px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#photo-list .year-divider:first-child {
+    padding-top: 5px;
+}
+
+.year-divider svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.year-divider.collapsed svg {
+    transform: rotate(-180deg); 
+}
+
+.year-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.year-group.collapsed {
+    display: none; 
+}
+
 .photo-bar {
     display: flex;
     align-items: center;
@@ -66,6 +109,8 @@ body {
     padding: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .photo-bar:hover,
@@ -156,6 +201,9 @@ body {
 
     opacity: 0;
     transition: opacity 0.35s ease, visibility 0.35s ease;
+
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .modal.show {

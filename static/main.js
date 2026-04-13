@@ -191,6 +191,14 @@ async function initGallery() {
         }
 
         photos = await response.json();
+        photos.sort((a, b) => {
+            if (b.year !== a.year) return b.year - a.year;
+            if (b.month !== a.month) return b.month - a.month;
+            return b.day - a.day;
+        }); // sort
+
+        let lastYear = null;
+        let currentYearGroup = null;
         photos.forEach(photo => {
             const marker = L.marker([photo.lat, photo.lng])
                 .bindTooltip(`<b>${photo.title}</b>`, {
@@ -223,17 +231,42 @@ async function initGallery() {
             });
             // build img map tooltip
 
+            if (photo.year !== lastYear) {
+                const yearDivider = document.createElement('div');
+                yearDivider.className = 'year-divider';
+                yearDivider.innerHTML = `
+                    <span>${photo.year} 年</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                `;
+
+                const groupForThisYear = document.createElement('div');
+                groupForThisYear.className = 'year-group';
+
+                yearDivider.addEventListener('click', () => {
+                    yearDivider.classList.toggle('collapsed');
+                    groupForThisYear.classList.toggle('collapsed');
+                }); // click to show / hide
+
+                photoListContainer.appendChild(yearDivider);
+                photoListContainer.appendChild(groupForThisYear);
+                lastYear = photo.year;
+                currentYearGroup = groupForThisYear;
+            } // update year tag if needed
+
             const barDiv = document.createElement('div');
             barDiv.className = 'photo-bar';
             barDiv.id = `card-${photo.id}`;
             const locationArray = [photo.country, photo.state, photo.city];
             const locationString = locationArray.filter(item => item).join(' · ');
+            const dateString = `${photo.year}年${photo.month}月${photo.day}日`;
             barDiv.innerHTML = `
                 <img src="${photo.thumbUrl}" alt="${photo.title}"> 
                 <div class="info">
                     <h3>${photo.title}</h3>
                     <p class="location">${locationString}</p>
-                    <p class="date">${photo.date}</p>
+                    <p class="date">${dateString}</p>
                 </div>
             `;
             barDiv.addEventListener('click', () => {
@@ -241,7 +274,7 @@ async function initGallery() {
             });
             // build img bar
 
-            photoListContainer.appendChild(barDiv);
+            currentYearGroup.appendChild(barDiv);
         });
 
         if (markerArray.length > 0) {
