@@ -194,7 +194,8 @@ async function initGallery() {
         photos.sort((a, b) => {
             if (b.year !== a.year) return b.year - a.year;
             if (b.month !== a.month) return b.month - a.month;
-            return b.day - a.day;
+            if (b.day !== a.day) return b.day - a.day;
+            return b.id - a.id;
         }); // sort
 
         let lastYear = null;
