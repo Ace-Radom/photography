@@ -72,7 +72,7 @@ body {
     margin-bottom: 15px;
     padding-bottom: 15px;
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0; /* 防止头部被压缩 */
+    flex-shrink: 0;
 }
 
 .segmented-control {
@@ -104,33 +104,28 @@ body {
     transition: stroke 0.3s ease;
 }
 
-/* 选中状态 */
 .segment-btn.active {
     background-color: #ffffff;
     color: var(--accent-color);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .segment-btn:hover:not(.active) {
     color: var(--text-main);
 }
 
-/* =========================================
-   改造：多视图切换逻辑
-   ========================================= */
 .list-container {
     flex: 1;
-    overflow-y: visible; /* 滚动条已经交给了 photo-sidebar */
+    overflow-y: visible;
     display: flex;
     flex-direction: column;
 }
 
-/* 统一隐藏未激活的区段 */
-.list-section, .content-section {
-    display: none; 
+.list-section,
+.content-section {
+    display: none;
 }
 
-/* 显示激活的区段 */
 .list-section.active {
     display: flex;
     flex-direction: column;
@@ -344,6 +339,134 @@ body {
 .leaflet-tooltip-top.modern-tooltip::before {
     border-top-color: var(--border-color);
     bottom: 0;
+}
+
+.figure-detail-container {
+    padding: 30px;
+    height: 100%;
+    overflow-y: auto;
+    background-color: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.figure-header {
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 15px;
+}
+
+.figure-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: var(--text-main);
+    line-height: 1.3;
+}
+
+.figure-header .original-name {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-sub);
+    font-family: "Hiragino Sans", "Meiryo", sans-serif;
+}
+
+.figure-content {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.figure-visual {
+    width: 300px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.img-display-frame {
+    width: 100%;
+    height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.img-display-frame img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+}
+
+.view-selector {
+    display: flex;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    padding: 3px;
+    width: 100%;
+}
+
+.view-tab-btn {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-sub);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.view-tab-btn.active {
+    background-color: #ffffff;
+    color: var(--accent-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.figure-specs {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.spec-label {
+    font-size: 12px;
+    color: var(--text-sub);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.spec-value {
+    font-size: 15px;
+    color: var(--text-main);
+    line-height: 1.4;
 }
 
 .modal {

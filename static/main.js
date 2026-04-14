@@ -134,8 +134,114 @@ function handleLandscapePhotoFocus(photo) {
     } // normal fly-to
 }
 
-function handleFigurePhotoFocus(photo) {
-    openImageModal(photo.fullUrl, photo.title);
+function handleFigurePhotoFocus(photo, hpoiData) {
+    const viewContainer = document.getElementById('figure-view');
+    const hpoiId = photo['hpoi-id'];
+
+    const detailData = hpoiData[hpoiId];
+    if (!detailData) {
+        viewContainer.innerHTML = `<div class="placeholder-msg">未找到 ID 为 ${hpoiId} 的详细资料</div>`;
+        return;
+    }
+
+    const shipmentDate = detailData.shipment_date_year
+        ? `${detailData.shipment_date_year}年${detailData.shipment_date_month}月${detailData.shipment_date_day}日`
+        : "未知";
+
+    viewContainer.innerHTML = `
+        <div class="figure-detail-container">
+            <header class="figure-header">
+                <h1>${detailData.title}</h1>
+                <div class="original-name">${detailData.original_title}</div>
+            </header>
+
+            <div class="figure-content">
+                <div class="figure-visual">
+                    <div class="img-display-frame">
+                        <img id="detail-main-img" 
+                             src="${photo.fullUrl}" 
+                             alt="${detailData.title}">
+                    </div>
+                    
+                    <div class="view-selector">
+                        <button class="view-tab-btn active" data-type="work">个人摄影作品</button>
+                        <button class="view-tab-btn" data-type="official">官方资料图</button>
+                    </div>
+                </div>
+
+                <div class="figure-specs">
+                    <div class="spec-item">
+                        <span class="spec-label">制作</span>
+                        <span class="spec-value">${detailData.manufacture}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">系列</span>
+                        <span class="spec-value">${detailData.series}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">角色</span>
+                        <span class="spec-value">${detailData.character}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">作品</span>
+                        <span class="spec-value">${detailData.work}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">价格</span>
+                        <span class="spec-value">${detailData.price}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">发售日</span>
+                        <span class="spec-value">${shipmentDate}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">比例与尺寸</span>
+                        <span class="spec-value">${detailData.ratio} / ${detailData.size}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">材质</span>
+                        <span class="spec-value">${detailData.material}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const mainImg = viewContainer.querySelector('#detail-main-img');
+    const tabs = viewContainer.querySelectorAll('.view-tab-btn');
+
+    mainImg.style.transition = 'opacity 0.2s ease';
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            if (tab.classList.contains('active')) {
+                return;
+            }
+
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const type = tab.dataset.type;
+            const targetSrc = (type === 'official') ? detailData.official_img_url : photo.fullUrl;
+            mainImg.style.opacity = '0.4';
+            setTimeout(() => {
+                mainImg.src = targetSrc;
+                mainImg.onload = () => { mainImg.style.opacity = '1'; };
+                mainImg.onerror = () => {
+                    mainImg.style.opacity = '1';
+                    console.error("图片加载失败:", targetSrc);
+                };
+                if (type === 'official') {
+                    mainImg.style.cursor = 'default';
+                    mainImg.onclick = null;
+                } else {
+                    mainImg.style.cursor = 'zoom-in';
+                    mainImg.onclick = () => openImageModal(photo.fullUrl, photo.title);
+                } // only zoom on self
+                mainImg.onload = () => { mainImg.style.opacity = '1'; };
+            }, 150);
+        });
+    });
 }
 
 function latLngToTile(lat, lng, zoom) {
@@ -216,28 +322,31 @@ function createYearDivider(year) {
 async function initGallery() {
     try {
         const metaUrl = (isLocalDev) ? './assets/meta.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/meta.json';
+        const hpoiUrl = (isLocalDev) ? './assets/hpoi.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/hpoi.json';
         const derivativeIconSvgUrl = (isLocalDev) ? './assets/icon-derivative.svg' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/icon-derivative.svg';
 
-        const [metaResponse, derivativeIconSvgResponse] = await Promise.all([
+        const [metaResponse, hpoiResponse, derivativeIconSvgResponse] = await Promise.all([
             fetch(metaUrl),
+            fetch(hpoiUrl),
             fetch(derivativeIconSvgUrl)
         ]);
 
-        if (!metaResponse.ok) {
+        if (!metaResponse.ok || !hpoiResponse.ok) {
             throw new Error(`数据获取失败，状态码: ${metaResponse.status}`);
         }
         if (!derivativeIconSvgResponse.ok) {
             throw new Error(`图标获取失败，状态码: ${metaResponse.status}`);
         }
 
-        let metaString = await metaResponse.json();
+        let metaData = await metaResponse.json();
+        let hpoiData = await hpoiResponse.json();
         let derivativeIconSvgString = await derivativeIconSvgResponse.text();
 
         // ============================
         // Init Landscape Photo Gallery
         // ============================
 
-        landscapePhotos = metaString.landscape || [];
+        landscapePhotos = metaData.landscape || [];
         landscapePhotos.sort((a, b) => {
             if (b.year !== a.year) return b.year - a.year;
             if (b.month !== a.month) return b.month - a.month;
@@ -333,7 +442,7 @@ async function initGallery() {
         // Init Figure Photo Gallery
         // =========================
 
-        figurePhotos = metaString.figure || [];
+        figurePhotos = metaData.figure || [];
         figurePhotos.sort((a, b) => {
             if (b.year !== a.year) return b.year - a.year;
             if (b.month !== a.month) return b.month - a.month;
@@ -374,7 +483,7 @@ async function initGallery() {
                 ${tag}
             `;
             barDiv.addEventListener('click', () => {
-                handleFigurePhotoFocus(photo);
+                handleFigurePhotoFocus(photo, hpoiData);
             });
             // build img card
 
@@ -383,7 +492,7 @@ async function initGallery() {
 
     } catch (error) {
         console.error("加载数据失败:", error);
-        landscapeListContainer.innerHTML = '<div style="padding: 20px; color: #e53e3e;">未能加载摄影作品数据，请检查网络或 URL 设置。</div>';
+        landscapeListContainer.innerHTML = '<div style="padding: 20px; color: #e53e3e;">未能加载摄影作品数据，请检查网络设置。</div>';
     }
 }
 
