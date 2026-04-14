@@ -1,4 +1,4 @@
-name: Refresh Hpoi Data
+name: Fetch Hpoi Data
 
 on:
   push:
@@ -18,11 +18,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Refresh Hpoi Data
+      - name: Fetch Hpoi Data
         run: |
           python3 -m pip install --upgrade pip
           if [ -f ${{github.workspace}}/tools/requirements.txt ]; then pip install -r ${{github.workspace}}/tools/requirements.txt; fi
-          python3 ${{github.workspace}}/tools/refresh.py
+          python3 ${{github.workspace}}/tools/fetch-hpoi-data.py
         working-directory: ${{github.workspace}}
 
       - name: Extract Branch Name
@@ -35,5 +35,5 @@ jobs:
           github_token: ${{secrets.GITHUB_TOKEN}}
           author_email: ${{secrets.BOT_EMAIL}}
           author_name: ${{secrets.BOT_USERNAME}}
-          message: update hpoi data
+          message: fetch hpoi data
           branch: ${{steps.extract_branch.outputs.branch}}
