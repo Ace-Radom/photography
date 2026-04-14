@@ -40,9 +40,9 @@ let activeLayer = cartoDbMap;
 map.on('baselayerchange', function (e) {
     activeLayer = e.layer;
 
-    if (photos.length > 0) {
-        photos.forEach(photo => preloadMapTiles(photo.lat, photo.lng, targetZoomLevel));
-        preloadMacroMap(photos);
+    if (landscapePhotos.length > 0) {
+        landscapePhotos.forEach(photo => preloadMapTiles(photo.lat, photo.lng, targetZoomLevel));
+        preloadMacroMap(landscapePhotos);
     } // call new preload
 }); // listen map layer changes
 
@@ -71,14 +71,16 @@ modal.addEventListener('click', (e) => {
 });
 // full screen img show
 
-let photos = [];
+let landscapePhotos = [];
+let figurePhotos = [];
 const markers = {};
 const markerArray = [];
-const photoListContainer = document.getElementById('photo-list');
+const landscapeListContainer = document.getElementById('landscape-list');
+const figureListContainer = document.getElementById('figure-list')
 const targetZoomLevel = 14;
 let activePhotoId = null;
 
-function handlePhotoFocus(photo) {
+function handleLandscapePhotoFocus(photo) {
     const currentCenter = map.getCenter();
     const currentZoom = map.getZoom();
     const targetLatLng = L.latLng(photo.lat, photo.lng);
@@ -132,6 +134,10 @@ function handlePhotoFocus(photo) {
     } // normal fly-to
 }
 
+function handleFigurePhotoFocus(photo) {
+    openImageModal(photo.fullUrl, photo.title);
+}
+
 function latLngToTile(lat, lng, zoom) {
     const x = Math.floor((lng + 180) / 360 * Math.pow(2, zoom));
     const y = Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
@@ -152,11 +158,11 @@ function preloadMapTileImg(x, y, zoom) {
 }
 
 function preloadMapTiles(lat, lng, zoom) {
-    const tile = latLngToTile(lat, lng, zoom);
+    const { x, y } = latLngToTile(lat, lng, zoom);
 
     for (let i = -2; i <= 2; i++) {
         for (let j = -2; j <= 2; j++) {
-            preloadMapTileImg(tile.x + i, tile.y + j, zoom);
+            preloadMapTileImg(x + i, y + j, zoom);
         }
     }
 }
@@ -181,6 +187,32 @@ function preloadMacroMap(photosList) {
     }
 }
 
+function createYearDivider(year) {
+    const yearDivider = document.createElement('div');
+    yearDivider.className = 'year-divider';
+    yearDivider.innerHTML = `
+        <span>${year} 年</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    `;
+
+    const groupForThisYear = document.createElement('div');
+    groupForThisYear.className = 'year-group';
+
+    const innerWrapper = document.createElement('div');
+    innerWrapper.className = 'year-group-inner';
+    groupForThisYear.appendChild(innerWrapper);
+    // wrapper for show / hide animation
+
+    yearDivider.addEventListener('click', () => {
+        yearDivider.classList.toggle('collapsed');
+        groupForThisYear.classList.toggle('collapsed');
+    }); // click to show / hide
+
+    return { yearDivider, groupForThisYear, innerWrapper };
+}
+
 async function initGallery() {
     try {
         const metaUrl = (isLocalDev) ? './assets/meta.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/meta.json';
@@ -198,10 +230,15 @@ async function initGallery() {
             throw new Error(`图标获取失败，状态码: ${metaResponse.status}`);
         }
 
+        let metaString = await metaResponse.json();
         let derivativeIconSvgString = await derivativeIconSvgResponse.text();
 
-        photos = await metaResponse.json();
-        photos.sort((a, b) => {
+        // ============================
+        // Init Landscape Photo Gallery
+        // ============================
+
+        landscapePhotos = metaString.landscape || [];
+        landscapePhotos.sort((a, b) => {
             if (b.year !== a.year) return b.year - a.year;
             if (b.month !== a.month) return b.month - a.month;
             if (b.day !== a.day) return b.day - a.day;
@@ -210,7 +247,7 @@ async function initGallery() {
 
         let lastYear = null;
         let currentYearGroup = null;
-        photos.forEach(photo => {
+        landscapePhotos.forEach(photo => {
             const marker = L.marker([photo.lat, photo.lng])
                 .bindTooltip(`<b>${photo.title}</b>`, {
                     direction: 'top',
@@ -222,14 +259,14 @@ async function initGallery() {
             markers[photo.id] = marker;
             markerArray.push(marker);
             marker.on('mouseover', () => {
-                const correspondingCard = document.getElementById(`card-${photo.id}`);
+                const correspondingCard = document.getElementById(`landscape-card-${photo.id}`);
                 if (correspondingCard) {
                     correspondingCard.classList.add('highlight');
                     correspondingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             });
             marker.on('mouseout', () => {
-                const correspondingCard = document.getElementById(`card-${photo.id}`);
+                const correspondingCard = document.getElementById(`landscape-card-${photo.id}`);
                 if (correspondingCard) {
                     correspondingCard.classList.remove('highlight');
                 }
@@ -238,47 +275,26 @@ async function initGallery() {
                 } // do not close tooltip if it is the img on focus
             });
             marker.on('click', () => {
-                handlePhotoFocus(photo);
+                handleLandscapePhotoFocus(photo);
             });
             // build img map tooltip
 
             if (photo.year !== lastYear) {
-                const yearDivider = document.createElement('div');
-                yearDivider.className = 'year-divider';
-                yearDivider.innerHTML = `
-                    <span>${photo.year} 年</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                `;
-
-                const groupForThisYear = document.createElement('div');
-                groupForThisYear.className = 'year-group';
-
-                const innerWrapper = document.createElement('div');
-                innerWrapper.className = 'year-group-inner';
-                groupForThisYear.appendChild(innerWrapper);
-                // wrapper for show / hide animation
-
-                yearDivider.addEventListener('click', () => {
-                    yearDivider.classList.toggle('collapsed');
-                    groupForThisYear.classList.toggle('collapsed');
-                }); // click to show / hide
-
-                photoListContainer.appendChild(yearDivider);
-                photoListContainer.appendChild(groupForThisYear);
+                const { yearDivider, groupForThisYear, innerWrapper } = createYearDivider(photo.year);
+                landscapeListContainer.appendChild(yearDivider);
+                landscapeListContainer.appendChild(groupForThisYear);
                 lastYear = photo.year;
                 currentYearGroup = innerWrapper;
             } // update year tag if needed
 
             const barDiv = document.createElement('div');
             barDiv.className = 'photo-bar';
-            barDiv.id = `card-${photo.id}`;
+            barDiv.id = `landscape-card-${photo.id}`;
             const locationArray = [photo.country, photo.state, photo.city];
             const locationString = locationArray.filter(item => item).join(' · ');
             const dateString = `${photo.year}年${photo.month}月${photo.day}日`;
             let tag = '';
-            if (photo.type === "derivative") {
+            if (photo.type === 'derivative') {
                 tag = `
                 <div class="creative-indicator" data-tooltip="这是一幅二创作品">
                     ${derivativeIconSvgString}
@@ -295,9 +311,9 @@ async function initGallery() {
                 ${tag}
             `;
             barDiv.addEventListener('click', () => {
-                handlePhotoFocus(photo);
+                handleLandscapePhotoFocus(photo);
             });
-            // build img bar
+            // build img card
 
             currentYearGroup.appendChild(barDiv);
         });
@@ -308,13 +324,66 @@ async function initGallery() {
         } // zoom wide enough to show all tooptips on the map
 
         setTimeout(() => {
-            photos.forEach(photo => preloadMapTiles(photo.lat, photo.lng, targetZoomLevel));
-            preloadMacroMap(photos);
+            landscapePhotos.forEach(photo => preloadMapTiles(photo.lat, photo.lng, targetZoomLevel));
+            preloadMacroMap(landscapePhotos);
         }, 1500);
-        // delayed preload
+        // delayed map preload
+
+        // =========================
+        // Init Figure Photo Gallery
+        // =========================
+
+        figurePhotos = metaString.figure || [];
+        figurePhotos.sort((a, b) => {
+            if (b.year !== a.year) return b.year - a.year;
+            if (b.month !== a.month) return b.month - a.month;
+            if (b.day !== a.day) return b.day - a.day;
+            return b.id - a.id;
+        }); // sort
+
+        lastYear = null;
+        currentYearGroup = null;
+        figurePhotos.forEach(photo => {
+            if (photo.year !== lastYear) {
+                const { yearDivider, groupForThisYear, innerWrapper } = createYearDivider(photo.year);
+                figureListContainer.appendChild(yearDivider);
+                figureListContainer.appendChild(groupForThisYear);
+                lastYear = photo.year;
+                currentYearGroup = innerWrapper;
+            } // update year tag if needed
+
+            const barDiv = document.createElement('div');
+            barDiv.className = 'photo-bar';
+            barDiv.id = `figure-card-${photo.id}`;
+            const dateString = `${photo.year}年${photo.month}月${photo.day}日`;
+            let tag = '';
+            if (photo.type === 'derivative') {
+                tag = `
+                <div class="creative-indicator" data-tooltip="这是一幅二创作品">
+                    ${derivativeIconSvgString}
+                </div>
+                `
+            } // derivative work
+            barDiv.innerHTML = `
+                <img src="${photo.thumbUrl}" alt="${photo.title}"> 
+                <div class="info">
+                    <h3>${photo.title}</h3>
+                    <p class="original-title">${photo["title-original"]}</p>
+                    <p class="date">${dateString}</p>
+                </div>
+                ${tag}
+            `;
+            barDiv.addEventListener('click', () => {
+                handleFigurePhotoFocus(photo);
+            });
+            // build img card
+
+            currentYearGroup.appendChild(barDiv);
+        });
+
     } catch (error) {
         console.error("加载数据失败:", error);
-        photoListContainer.innerHTML = '<div style="padding: 20px; color: #e53e3e;">未能加载摄影作品数据，请检查网络或 URL 设置。</div>';
+        landscapeListContainer.innerHTML = '<div style="padding: 20px; color: #e53e3e;">未能加载摄影作品数据，请检查网络或 URL 设置。</div>';
     }
 }
 

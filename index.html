@@ -18,6 +18,78 @@
     </div>
 
     <div class="layout-container">
+        <div class="photo-sidebar">
+            
+            <div class="category-header">
+                <div class="segmented-control">
+                    <button class="segment-btn active" data-target="landscape">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                        风景漫游
+                    </button>
+                    <button class="segment-btn" data-target="figure">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        静物展厅
+                    </button>
+                </div>
+            </div>
+
+            <div class="list-container">
+                <div id="landscape-list" class="list-section active"></div>
+                <div id="figure-list" class="list-section"></div>
+            </div>
+
+            <footer class="site-footer">
+                <div class="footer-content">
+                    <div class="social-links">
+                        <a href="https://x.com/Hisaki03492862" target="_blank" title="X Profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
+                            </svg>
+                        </a>
+                        
+                        <a href="https://github.com/Ace-Radom" target="_blank" title="Github Profile">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <p class="site-copyright">&copy; 2026 Ace-Radom. All rights reserved.</p>
+                    
+                    <p class="photo-copyright">
+                        本网站展示的所有摄影作品（含缩略图与高清原图）均受著作权保护。<br>
+                        所有被标记为二次创作的作品的原图也均由作者拍摄。<br>
+                        未经作者本人书面许可，严禁任何人以任何形式抓取、下载、转载、修改，或是用于任何商业及 AI 训练用途。
+                    </p>
+                    
+                    <div class="license-info">
+                        <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">
+                            <img alt="知识共享许可协议" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png" />
+                        </a>
+                        <p>
+                            本站公开浏览的作品采用 
+                            <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">BY-NC-ND 4.0 协议</a> 进行许可。
+                        </p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+        
+        <div class="main-content-wrapper">
+            <div id="landscape-view" class="content-section active">
+                <div id="map"></div>
+            </div>
+            
+            <div id="figure-view" class="content-section">
+                <div class="figure-placeholder" style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--text-sub); font-size:18px;">
+                    手办资料展示区（建设中...）
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- <div class="layout-container">
         <div class="photo-sidebar" >
             <div id="photo-list"></div>
 
@@ -56,7 +128,7 @@
                     </div>
                 </div>
             </footer>
-        </div>
+        </div> -->
         
         <div class="map-wrapper">
             <div id="map"></div>

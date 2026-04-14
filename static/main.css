@@ -68,6 +68,80 @@ body {
     background: linear-gradient(180deg, #a0aec0 0%, #718096 100%);
 }
 
+.category-header {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; /* 防止头部被压缩 */
+}
+
+.segmented-control {
+    display: flex;
+    background-color: var(--bg-color);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+}
+
+.segment-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    color: var(--text-sub);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.segment-btn svg {
+    transition: stroke 0.3s ease;
+}
+
+/* 选中状态 */
+.segment-btn.active {
+    background-color: #ffffff;
+    color: var(--accent-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.segment-btn:hover:not(.active) {
+    color: var(--text-main);
+}
+
+/* =========================================
+   改造：多视图切换逻辑
+   ========================================= */
+.list-container {
+    flex: 1;
+    overflow-y: visible; /* 滚动条已经交给了 photo-sidebar */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 统一隐藏未激活的区段 */
+.list-section, .content-section {
+    display: none; 
+}
+
+/* 显示激活的区段 */
+.list-section.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.content-section.active {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
 #photo-list {
     display: flex;
     flex-direction: column;
@@ -235,13 +309,14 @@ body {
     transform: translateY(-2px);
 }
 
-.map-wrapper {
+.main-content-wrapper {
     width: 67%;
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
     position: relative;
     border: 2px solid var(--border-color);
+    background-color: var(--panel-bg);
 }
 
 #map {
