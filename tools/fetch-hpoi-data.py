@@ -54,14 +54,14 @@ def get_data_from_html(
 
 def extract_date_numbers(date_str: str) -> tuple[int, int, int]:
     numbers = re.findall(r"\d+", date_str)
-    if len(numbers) >= 3:
-        year = int(numbers[0])
+    year = int(numbers[0])
+    month = 0
+    day = 0
+    if len(numbers) > 1:
         month = int(numbers[1])
+    if len(numbers) > 2:
         day = int(numbers[2])
-        return year, month, day
-    else:
-        print(f"ERROR: invalid date str '{date_str}'.")
-        exit(1)
+    return year, month, day
 
 
 def main() -> None:
@@ -183,6 +183,14 @@ def main() -> None:
             target_str_end="</p>",
             with_possible_hyperlink=True,
         )
+        if prototype == "":
+            prototype = get_data_from_html(
+                html_str,
+                anchors=['<div class="infoList-box">', "<span>原画</span>"],
+                target_str_begin="<p>",
+                target_str_end="</p>",
+                with_possible_hyperlink=True,
+            )
 
         painting = get_data_from_html(
             html_str,
@@ -214,6 +222,14 @@ def main() -> None:
             target_str_begin="<p>",
             target_str_end="</p>",
         )
+        if size == "":
+            size = get_data_from_html(
+                html_str,
+                anchors=['<div class="infoList-box">', "<span>大概尺寸</span>"],
+                target_str_begin="<p>",
+                target_str_end="</p>",
+            )
+            size = f"~{size}"
 
         material = get_data_from_html(
             html_str,
