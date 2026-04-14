@@ -80,6 +80,14 @@ const figureListContainer = document.getElementById('figure-list')
 const targetZoomLevel = 14;
 let activePhotoId = null;
 
+function formatDate(y, m, d) {
+    let parts = [];
+    if (y && y !== 0) parts.push(`${y}年`);
+    if (m && m !== 0) parts.push(`${m}月`);
+    if (d && d !== 0) parts.push(`${d}日`);
+    return parts.length > 0 ? parts.join('') : "未知";
+}
+
 function handleLandscapePhotoFocus(photo) {
     const currentCenter = map.getCenter();
     const currentZoom = map.getZoom();
@@ -144,9 +152,7 @@ function handleFigurePhotoFocus(photo, hpoiData) {
         return;
     }
 
-    const shipmentDate = detailData.shipment_date_year
-        ? `${detailData.shipment_date_year}年${detailData.shipment_date_month}月${detailData.shipment_date_day}日`
-        : "未知";
+    const shipmentDate = formatDate(detailData.shipment_date_year, detailData.shipment_date_month, detailData.shipment_date_day);
 
     viewContainer.innerHTML = `
         <div class="figure-detail-container">
@@ -169,43 +175,51 @@ function handleFigurePhotoFocus(photo, hpoiData) {
                     </div>
                 </div>
 
-                <div class="figure-specs">
-                    <div class="spec-item">
-                        <span class="spec-label">制作</span>
-                        <span class="spec-value">${detailData.manufacture}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">系列</span>
-                        <span class="spec-value">${detailData.series}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">角色</span>
-                        <span class="spec-value">${detailData.character}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">作品</span>
-                        <span class="spec-value">${detailData.work}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">价格</span>
-                        <span class="spec-value">${detailData.price}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">发售日</span>
-                        <span class="spec-value">${shipmentDate}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">比例与尺寸</span>
-                        <span class="spec-value">${detailData.ratio} / ${detailData.size}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">材质</span>
-                        <span class="spec-value">${detailData.material}</span>
-                    </div>
-                </div>
+                <div class="figure-specs" id="specs-container"></div>
             </div>
         </div>
     `;
+
+    const FIGURE_SPEC_TABLE = [
+        { label: '定价', key: 'price' },
+        { label: '出货日', key: 'shipment_date', isCustom: true },
+        { label: '制作', key: 'manufacture' },
+        { label: '系列', key: 'series' },
+        { label: '原型 / 原画', key: 'prototype' },
+        { label: '涂装', key: 'painting' },
+        { label: '角色', key: 'character' },
+        { label: '作品', key: 'work' },
+        { label: '比例', key: 'ratio' },
+        { label: '尺寸', key: 'size' },
+        { label: '材质', key: 'material' }
+    ];
+
+    const specsContainer = viewContainer.querySelector('#specs-container');
+    specsContainer.innerHTML = '';
+    FIGURE_SPEC_TABLE.forEach(obj => {
+        let value = '';
+        if (obj.isCustom && obj.key == "shipment_date") {
+            value = formatDate(
+                detailData.shipment_date_year,
+                detailData.shipment_date_month,
+                detailData.shipment_date_day
+            );
+        } // shipment date
+        else {
+            value = detailData[obj.key];
+        }
+
+        if (value !== '') {
+            const specItem = document.createElement('div');
+            specItem.className = 'spec-item';
+            specItem.innerHTML = `
+                <span class="spec-label">${obj.label}</span>
+                <span class="spec-value">${value}</span>
+            `;
+            specsContainer.appendChild(specItem);
+        } // value not empty
+    });
+    // insert specs
 
     const mainImg = viewContainer.querySelector('#detail-main-img');
     const tabs = viewContainer.querySelectorAll('.view-tab-btn');
@@ -401,7 +415,7 @@ async function initGallery() {
             barDiv.id = `landscape-card-${photo.id}`;
             const locationArray = [photo.country, photo.state, photo.city];
             const locationString = locationArray.filter(item => item).join(' · ');
-            const dateString = `${photo.year}年${photo.month}月${photo.day}日`;
+            const dateString = formatDate(photo.year, photo.month, photo.day);
             let tag = '';
             if (photo.type === 'derivative') {
                 tag = `
@@ -464,7 +478,7 @@ async function initGallery() {
             const barDiv = document.createElement('div');
             barDiv.className = 'photo-bar';
             barDiv.id = `figure-card-${photo.id}`;
-            const dateString = `${photo.year}年${photo.month}月${photo.day}日`;
+            const dateString = formatDate(photo.year, photo.month, photo.day);
             let tag = '';
             if (photo.type === 'derivative') {
                 tag = `
