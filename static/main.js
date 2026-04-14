@@ -34,11 +34,11 @@ if (isLocalDev) {
     });
 } // local dev env
 
-let activeLayer = cartoDbMap;
+let activeMapLayer = cartoDbMap;
 // use CartoDB as default
 
-map.on('baselayerchange', function (e) {
-    activeLayer = e.layer;
+map.on('baselayerchange', (e) => {
+    activeMapLayer = e.layer;
 
     if (landscapePhotos.length > 0) {
         landscapePhotos.forEach(photo => preloadMapTiles(photo.lat, photo.lng, targetZoomLevel));
@@ -80,6 +80,9 @@ const figureListContainer = document.getElementById('figure-list')
 const targetZoomLevel = 14;
 let activeLandscapePhotoId = null;
 let activeFigurePhotoId = null;
+const preloadedImgSet = new Set();
+const preloadedImgKeeper = {};
+const preloadAfterHoverMs = 300;
 
 function formatDate(y, m, d) {
     let parts = [];
@@ -127,16 +130,15 @@ function handleLandscapePhotoFocus(photo) {
     return;
 }
 
-function handleFigurePhotoFocus(photo, hpoiData) {
+function handleFigurePhotoFocus(photo, specData) {
     if (activeFigurePhotoId === photo.id) {
         return;
     }
 
+    let hpoiId = photo["hpoi-id"];
     const viewContainer = document.getElementById('figure-view');
-    const hpoiId = photo['hpoi-id'];
 
-    const detailData = hpoiData[hpoiId];
-    if (!detailData) {
+    if (!specData) {
         viewContainer.innerHTML = `<div class="placeholder-msg">未找到 ID 为 ${hpoiId} 的详细资料</div>`;
         return;
     }
@@ -144,8 +146,8 @@ function handleFigurePhotoFocus(photo, hpoiData) {
     viewContainer.innerHTML = `
         <div class="figure-detail-container">
             <header class="figure-header">
-                <h1>${detailData.title}</h1>
-                <div class="original-name">${detailData.original_title}</div>
+                <h1>${specData.title}</h1>
+                <div class="original-name">${specData.original_title}</div>
             </header>
 
             <div class="figure-content">
@@ -153,7 +155,7 @@ function handleFigurePhotoFocus(photo, hpoiData) {
                     <div class="img-display-frame">
                         <img id="detail-main-img" 
                              src="${photo.fullUrl}" 
-                             alt="${detailData.title}">
+                             alt="${specData.title}">
                     </div>
                     
                     <div class="view-selector">
@@ -189,13 +191,13 @@ function handleFigurePhotoFocus(photo, hpoiData) {
         let value = '';
         if (obj.isCustom && obj.key == "shipment_date") {
             value = formatDate(
-                detailData.shipment_date_year,
-                detailData.shipment_date_month,
-                detailData.shipment_date_day
+                specData.shipment_date_year,
+                specData.shipment_date_month,
+                specData.shipment_date_day
             );
         } // shipment date
         else {
-            value = detailData[obj.key];
+            value = specData[obj.key];
         }
 
         if (value !== '') {
@@ -212,7 +214,7 @@ function handleFigurePhotoFocus(photo, hpoiData) {
     hpoiIdSpecItem.className = 'spec-item';
     hpoiIdSpecItem.innerHTML = `
         <span class="spec-label">Hpoi ID</span>
-        <span class="spec-value"><a href="${detailData.hpoi_url}" target="_blank" title="Hpoi详情页">${hpoiId}</a></span>
+        <span class="spec-value"><a href="${specData.hpoi_url}" target="_blank" title="Hpoi详情页">${hpoiId}</a></span>
     `;
     specsContainer.appendChild(hpoiIdSpecItem);
     // insert specs
@@ -235,7 +237,7 @@ function handleFigurePhotoFocus(photo, hpoiData) {
             tab.classList.add('active');
 
             const type = tab.dataset.type;
-            const targetSrc = (type === 'official') ? detailData.official_img_url : photo.fullUrl;
+            const targetSrc = (type === 'official') ? specData.official_img_url : photo.fullUrl;
             mainImg.style.opacity = '0.4';
             setTimeout(() => {
                 mainImg.src = targetSrc;
@@ -268,10 +270,10 @@ function preloadMapTileImg(x, y, zoom) {
         x: x,
         y: y,
         z: zoom,
-        s: activeLayer._getSubdomain ? activeLayer._getSubdomain({ x: x, y: y }) : 'a',
+        s: activeMapLayer._getSubdomain ? activeMapLayer._getSubdomain({ x: x, y: y }) : 'a',
         r: L.Browser.retina ? '@2x' : ''
     };
-    const tileUrl = L.Util.template(activeLayer._url, L.extend({}, activeLayer.options, tileData));
+    const tileUrl = L.Util.template(activeMapLayer._url, L.extend({}, activeMapLayer.options, tileData));
     const img = new Image();
     img.src = tileUrl;
 }
@@ -304,6 +306,16 @@ function preloadMacroMap(photosList) {
             preloadMapTileImg(x, y, macroZoom);
         }
     }
+}
+
+function preloadImgIfNeeded(url) {
+    if (!preloadedImgSet.has(url)) {
+        preloadedImgSet.add(url);
+        const preloadImg = new Image();
+        preloadImg.src = url;
+        preloadedImgKeeper[url] = preloadImg;
+    }
+    return;
 }
 
 function createYearDivider(year) {
@@ -370,6 +382,8 @@ async function initGallery() {
         let lastYear = null;
         let currentYearGroup = null;
         landscapePhotos.forEach(photo => {
+            let hoverTimer = null;
+
             const marker = L.marker([photo.lat, photo.lng])
                 .bindTooltip(`<b>${photo.title}</b>`, {
                     direction: 'top',
@@ -386,6 +400,10 @@ async function initGallery() {
                     correspondingCard.classList.add('highlight');
                     correspondingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
+                hoverTimer = setTimeout(() => {
+                    preloadImgIfNeeded(photo.fullUrl);
+                }, preloadAfterHoverMs);
+                // get focus, preload
             });
             marker.on('mouseout', () => {
                 const correspondingCard = document.getElementById(`landscape-card-${photo.id}`);
@@ -395,6 +413,10 @@ async function initGallery() {
                 if (activeLandscapePhotoId === photo.id) {
                     marker.openTooltip();
                 } // do not close tooltip if it is the img on focus
+                if (hoverTimer) {
+                    clearTimeout(hoverTimer);
+                    hoverTimer = null;
+                } // clear timer
             });
             marker.on('click', () => {
                 handleLandscapePhotoFocus(photo);
@@ -436,11 +458,19 @@ async function initGallery() {
                 if (activeLandscapePhotoId !== photo.id) {
                     marker.openTooltip();
                 }
+                hoverTimer = setTimeout(() => {
+                    preloadImgIfNeeded(photo.fullUrl);
+                }, preloadAfterHoverMs);
+                // get focus, preload
             });
             barDiv.addEventListener('mouseleave', () => {
                 if (activeLandscapePhotoId !== photo.id) {
                     marker.closeTooltip();
                 }
+                if (hoverTimer) {
+                    clearTimeout(hoverTimer);
+                    hoverTimer = null;
+                } // clear timer
             });
             barDiv.addEventListener('click', () => {
                 handleLandscapePhotoFocus(photo);
@@ -476,6 +506,8 @@ async function initGallery() {
         lastYear = null;
         currentYearGroup = null;
         figurePhotos.forEach(photo => {
+            let hoverTimer = null;
+
             if (photo.year !== lastYear) {
                 const { yearDivider, groupForThisYear, innerWrapper } = createYearDivider(photo.year);
                 figureListContainer.appendChild(yearDivider);
@@ -505,8 +537,24 @@ async function initGallery() {
                 </div>
                 ${tag}
             `;
+            const specData = hpoiData[photo["hpoi-id"]];
+            barDiv.addEventListener('mouseenter', () => {
+                if (specData) {
+                    hoverTimer = setTimeout(() => {
+                        preloadImgIfNeeded(photo.fullUrl);
+                        preloadImgIfNeeded(specData.official_img_url);
+                    });
+                    // get focus, preload
+                }
+            });
+            barDiv.addEventListener('mouseleave', () => {
+                if (hoverTimer) {
+                    clearTimeout(hoverTimer);
+                    hoverTimer = null;
+                } // clear timer
+            });
             barDiv.addEventListener('click', () => {
-                handleFigurePhotoFocus(photo, hpoiData);
+                handleFigurePhotoFocus(photo, specData);
             });
             // build img card
 
