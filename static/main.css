@@ -417,8 +417,8 @@ body {
 .view-selector {
     display: flex;
     background-color: var(--bg-color);
-    border-radius: 8px;
-    padding: 3px;
+    border-radius: var(--radius-sm);
+    padding: 4px;
     width: 100%;
 }
 
@@ -440,6 +440,10 @@ body {
     background-color: #ffffff;
     color: var(--accent-color);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.view-tab-btn:hover:not(.active) {
+    color: var(--text-main)
 }
 
 .figure-specs {

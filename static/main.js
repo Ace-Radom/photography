@@ -78,7 +78,8 @@ const markerArray = [];
 const landscapeListContainer = document.getElementById('landscape-list');
 const figureListContainer = document.getElementById('figure-list')
 const targetZoomLevel = 14;
-let activePhotoId = null;
+let activeLandscapePhotoId = null;
+let activeFigurePhotoId = null;
 
 function formatDate(y, m, d) {
     let parts = [];
@@ -93,56 +94,44 @@ function handleLandscapePhotoFocus(photo) {
     const currentZoom = map.getZoom();
     const targetLatLng = L.latLng(photo.lat, photo.lng);
 
-    const isSameLat = Math.abs(currentCenter.lat - photo.lat) < 0.0001;
-    const isSameLng = Math.abs(currentCenter.lng - photo.lng) < 0.0001;
-    const isSameZoom = currentZoom === targetZoomLevel;
-
-    if (activePhotoId && activePhotoId !== photo.id) {
-        markers[activePhotoId].closeTooltip();
+    if (activeLandscapePhotoId && activeLandscapePhotoId !== photo.id) {
+        markers[activeLandscapePhotoId].closeTooltip();
     } // cleanup last tooltip
 
-    if (activePhotoId === photo.id && isSameLat && isSameLng && isSameZoom) {
-        markers[photo.id].openTooltip();
-        openImageModal(photo.fullUrl, photo.title);
-        return;
-    } // same pos, open img in full screen
-
-    activePhotoId = photo.id;
+    activeLandscapePhotoId = photo.id;
 
     const inBounds = map.getBounds().contains(targetLatLng);
-    const streetLevelZoom = targetZoomLevel - 1;
+    const streetLevelZoom = targetZoomLevel - 2;
     const isZoomedInEnough = currentZoom >= streetLevelZoom;
 
     if (inBounds && isZoomedInEnough) {
-        const p1 = map.project(currentCenter, currentZoom);
-        const p2 = map.project(targetLatLng, currentZoom);
-        const slideDuration = Math.max(0.25, Math.min(0.8, p1.distanceTo(p2) / 1000));
+        markers[photo.id].openTooltip();
+        openImageModal(photo.fullUrl, photo.title);
+        return;
+    } // in bounds & zoomed in enough, open in full screen
 
-        map.panTo(targetLatLng, { animate: true, duration: slideDuration });
+    const distanceKm = currentCenter.distanceTo(targetLatLng) / 1000;
+    let flyDuration = 1.5;
+    if (distanceKm < 20) flyDuration = 0.6;
+    else if (distanceKm < 300) flyDuration = 0.9;
+    else if (distanceKm < 1500) flyDuration = 1.2;
+    // calc fly duration
 
-        map.once('moveend', () => {
-            if (activePhotoId === photo.id) markers[photo.id].openTooltip();
-        }); // open tooltip after move
-    } // slide (new tooltip in view & enough zoom)
-    else {
-        const distanceKm = currentCenter.distanceTo(targetLatLng) / 1000;
-        let flyDuration = 1.5;
-        if (distanceKm < 20) flyDuration = 0.6;
-        else if (distanceKm < 300) flyDuration = 0.9;
-        else if (distanceKm < 1500) flyDuration = 1.2;
-        // calc fly duration
+    map.flyTo(targetLatLng, targetZoomLevel, { duration: flyDuration });
 
-        map.flyTo(targetLatLng, targetZoomLevel, { duration: flyDuration });
-
-        map.once('moveend', () => {
-            if (activePhotoId === photo.id) {
-                markers[photo.id].openTooltip();
-            }
-        }); // open tooltip after move
-    } // normal fly-to
+    map.once('moveend', () => {
+        if (activeLandscapePhotoId === photo.id) {
+            markers[photo.id].openTooltip();
+        }
+    }); // open tooltip after move
+    return;
 }
 
 function handleFigurePhotoFocus(photo, hpoiData) {
+    if (activeFigurePhotoId === photo.id) {
+        return;
+    }
+
     const viewContainer = document.getElementById('figure-view');
     const hpoiId = photo['hpoi-id'];
 
@@ -177,6 +166,8 @@ function handleFigurePhotoFocus(photo, hpoiData) {
             </div>
         </div>
     `;
+
+    activeFigurePhotoId = photo.id;
 
     const FIGURE_SPEC_TABLE = [
         { label: '定价', key: 'price' },
@@ -401,7 +392,7 @@ async function initGallery() {
                 if (correspondingCard) {
                     correspondingCard.classList.remove('highlight');
                 }
-                if (activePhotoId === photo.id) {
+                if (activeLandscapePhotoId === photo.id) {
                     marker.openTooltip();
                 } // do not close tooltip if it is the img on focus
             });
@@ -441,6 +432,16 @@ async function initGallery() {
                 </div>
                 ${tag}
             `;
+            barDiv.addEventListener('mouseenter', () => {
+                if (activeLandscapePhotoId !== photo.id) {
+                    marker.openTooltip();
+                }
+            });
+            barDiv.addEventListener('mouseleave', () => {
+                if (activeLandscapePhotoId !== photo.id) {
+                    marker.closeTooltip();
+                }
+            });
             barDiv.addEventListener('click', () => {
                 handleLandscapePhotoFocus(photo);
             });
