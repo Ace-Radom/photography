@@ -2,7 +2,10 @@ name: Fetch Hpoi Data
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+    paths:
+      - 'assets/meta.json'
   workflow_dispatch:
 
 jobs:
