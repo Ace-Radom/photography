@@ -152,8 +152,6 @@ function handleFigurePhotoFocus(photo, hpoiData) {
         return;
     }
 
-    const shipmentDate = formatDate(detailData.shipment_date_year, detailData.shipment_date_month, detailData.shipment_date_day);
-
     viewContainer.innerHTML = `
         <div class="figure-detail-container">
             <header class="figure-header">
@@ -219,12 +217,22 @@ function handleFigurePhotoFocus(photo, hpoiData) {
             specsContainer.appendChild(specItem);
         } // value not empty
     });
+    const hpoiIdSpecItem = document.createElement('div');
+    hpoiIdSpecItem.className = 'spec-item';
+    hpoiIdSpecItem.innerHTML = `
+        <span class="spec-label">Hpoi ID</span>
+        <span class="spec-value"><a href="${detailData.hpoi_url}" target="_blank" title="Hpoi详情页">${hpoiId}</a></span>
+    `;
+    specsContainer.appendChild(hpoiIdSpecItem);
     // insert specs
 
     const mainImg = viewContainer.querySelector('#detail-main-img');
     const tabs = viewContainer.querySelectorAll('.view-tab-btn');
 
     mainImg.style.transition = 'opacity 0.2s ease';
+    mainImg.style.cursor = 'zoom-in';
+    mainImg.onclick = () => openImageModal(photo.fullUrl, photo.title);
+    // show custom work on default, allow zoom
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {

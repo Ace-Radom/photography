@@ -469,6 +469,17 @@ body {
     line-height: 1.4;
 }
 
+.spec-value a {
+    color: var(--accent-color, #4299e1);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.spec-value a:hover {
+    color: #2b6cb0;
+    text-decoration: underline;
+}
+
 .modal {
     display: flex;
     visibility: hidden;
