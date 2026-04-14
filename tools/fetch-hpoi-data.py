@@ -245,10 +245,11 @@ def main() -> None:
         hpoi_datas[id] = this_hpoi_data
 
     hpoi_path = assets_dir / "hpoi.json"
-    with open(hpoi_path, 'w', encoding='utf-8') as wfile:
+    with open(hpoi_path, "w", encoding="utf-8") as wfile:
         json.dump(hpoi_datas, wfile, indent=4, ensure_ascii=False)
 
     return
+
 
 if __name__ == "__main__":
     main()
