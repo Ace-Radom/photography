@@ -179,6 +179,21 @@
             "fullUrl": "https://photo.atina-proj.dev/2026-04/DSC_0628_cut_fin_1x_ci.jpg",
             "lat": 51.225441,
             "lng": 6.758156
+        },
+        {
+            "id": 13,
+            "title": "黑林山区 Burgruine Waldau",
+            "country": "德国",
+            "state": "巴登-符腾堡",
+            "city": "黑林山区柯尼希斯费尔德",
+            "year": 2026,
+            "month": 5,
+            "day": 1,
+            "type": "composite",
+            "thumbUrl": "https://photo.atina-proj.dev/2026-05/DSC_0677_hdr_nc_cut_fin_600px_c.jpg",
+            "fullUrl": "https://photo.atina-proj.dev/2026-05/DSC_0677_hdr_nc_cut_fin_1x_ci.jpg",
+            "lat": 48.156467,
+            "lng": 8.413941
         }
     ],
     "figure": [

@@ -348,23 +348,26 @@ async function initGallery() {
     try {
         const metaUrl = (isLocalDev) ? './assets/meta.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/meta.json';
         const hpoiUrl = (isLocalDev) ? './assets/hpoi.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/hpoi.json';
+        const compositeIconSvgUrl = (isLocalDev) ? './assets/icon-composite.svg' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/icon-composite.svg';
         const derivativeIconSvgUrl = (isLocalDev) ? './assets/icon-derivative.svg' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/icon-derivative.svg';
 
-        const [metaResponse, hpoiResponse, derivativeIconSvgResponse] = await Promise.all([
+        const [metaResponse, hpoiResponse, compositeIconSvgResponse, derivativeIconSvgResponse] = await Promise.all([
             fetch(metaUrl),
             fetch(hpoiUrl),
+            fetch(compositeIconSvgUrl),
             fetch(derivativeIconSvgUrl)
         ]);
 
         if (!metaResponse.ok || !hpoiResponse.ok) {
             throw new Error(`数据获取失败，状态码: ${metaResponse.status}`);
         }
-        if (!derivativeIconSvgResponse.ok) {
+        if (!compositeIconSvgResponse.ok || !derivativeIconSvgResponse.ok) {
             throw new Error(`图标获取失败，状态码: ${metaResponse.status}`);
         }
 
         let metaData = await metaResponse.json();
         let hpoiData = await hpoiResponse.json();
+        let compositeIconSvgString = await compositeIconSvgResponse.text();
         let derivativeIconSvgString = await derivativeIconSvgResponse.text();
 
         // ============================
@@ -438,7 +441,14 @@ async function initGallery() {
             const locationString = locationArray.filter(item => item).join(' · ');
             const dateString = formatDate(photo.year, photo.month, photo.day);
             let tag = '';
-            if (photo.type === 'derivative') {
+            if (photo.type == 'composite') {
+                tag = `
+                <div class="creative-indicator" data-tooltip="这幅作品由多张合成">
+                    ${compositeIconSvgString}
+                </div>
+                `
+            } // composite work
+            else if (photo.type === 'derivative') {
                 tag = `
                 <div class="creative-indicator" data-tooltip="这是一幅二创作品">
                     ${derivativeIconSvgString}
@@ -521,7 +531,14 @@ async function initGallery() {
             barDiv.id = `figure-card-${photo.id}`;
             const dateString = formatDate(photo.year, photo.month, photo.day);
             let tag = '';
-            if (photo.type === 'derivative') {
+            if (photo.type == 'composite') {
+                tag = `
+                <div class="creative-indicator" data-tooltip="这幅作品由多张合成">
+                    ${compositeIconSvgString}
+                </div>
+                `
+            } // composite work
+            else if (photo.type === 'derivative') {
                 tag = `
                 <div class="creative-indicator" data-tooltip="这是一幅二创作品">
                     ${derivativeIconSvgString}
