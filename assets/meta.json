@@ -209,6 +209,21 @@
             "fullUrl": "https://photo.atina-proj.dev/2026-05/DSC_0677_hdr_nc_cut_fin_1x_ci.jpg",
             "lat": 48.156467,
             "lng": 8.413941
+        },
+        {
+            "id": 15,
+            "title": "黑林山区 Erdmannsweiler",
+            "country": "德国",
+            "state": "巴登-符腾堡",
+            "city": "黑林山区柯尼希斯费尔德",
+            "year": 2026,
+            "month": 5,
+            "day": 22,
+            "type": "composite",
+            "thumbUrl": "https://photo.atina-proj.dev/2026-05/DSC_0096_hdr_cut_fin_600px_c.jpg",
+            "fullUrl": "https://photo.atina-proj.dev/2026-05/DSC_0096_hdr_cut_fin_1x_ci.jpg",
+            "lat": 48.140181,
+            "lng": 8.443317
         }
     ],
     "figure": [
