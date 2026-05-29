@@ -103,13 +103,26 @@ function handleLandscapePhotoFocus(photo) {
 
     activeLandscapePhotoId = photo.id;
 
-    const inBounds = map.getBounds().contains(targetLatLng);
+    const bounds = map.getBounds();
+    const safeBounds = bounds.pad(-0.1);
+
+    const inBounds = bounds.contains(targetLatLng);
     const streetLevelZoom = targetZoomLevel - 2;
     const isZoomedInEnough = currentZoom >= streetLevelZoom;
 
     if (inBounds && isZoomedInEnough) {
-        markers[photo.id].openTooltip();
-        openImageModal(photo.fullUrl, photo.title);
+        const inSafeBounds = safeBounds.contains(targetLatLng)
+        if (inSafeBounds)
+        {
+            markers[photo.id].openTooltip();
+            openImageModal(photo.fullUrl, photo.title);
+            return;
+        }
+
+        map.panTo(targetLatLng, { animate: true, duration: 0.5 });
+        map.once('moveend', () => {
+            markers[photo.id].openTooltip();
+        }); // open tooltip after move
         return;
     } // in bounds & zoomed in enough, open in full screen
 
@@ -123,9 +136,7 @@ function handleLandscapePhotoFocus(photo) {
     map.flyTo(targetLatLng, targetZoomLevel, { duration: flyDuration });
 
     map.once('moveend', () => {
-        if (activeLandscapePhotoId === photo.id) {
-            markers[photo.id].openTooltip();
-        }
+        markers[photo.id].openTooltip();
     }); // open tooltip after move
     return;
 }
