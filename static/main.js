@@ -2,7 +2,7 @@ const cartoDbMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/vo
 const esriMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri' });
 
 const map = L.map('map', { layers: [cartoDbMap] });
-L.control.layers({ "彩色简易 (Carto)": cartoDbMap, "防报错备用 (Esri)": esriMap }).addTo(map);
+L.control.layers({ "Carto 地图": cartoDbMap, "Esri 地图": esriMap }).addTo(map);
 // init map & layers
 
 const isLocalDev = window.location.hostname === 'localhost' ||
