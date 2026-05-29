@@ -224,6 +224,21 @@
             "fullUrl": "https://photo.atina-proj.dev/2026-05/DSC_0096_hdr_cut_fin_1x_ci.jpg",
             "lat": 48.140181,
             "lng": 8.443317
+        },
+        {
+            "id": 16,
+            "title": "黑林山区 星降",
+            "country": "德国",
+            "state": "巴登-符腾堡",
+            "city": "黑林山区柯尼希斯费尔德",
+            "year": 2026,
+            "month": 5,
+            "day": 29,
+            "type": "composite",
+            "thumbUrl": "https://photo.atina-proj.dev/2026-05/DSC_0208_hdr_nc_cut_fin_600px_c.jpg",
+            "fullUrl": "https://photo.atina-proj.dev/2026-05/DSC_0208_hdr_nc_cut_fin_1x_ci.jpg",
+            "lat": 48.141862,
+            "lng": 8.445830
         }
     ],
     "figure": [
