@@ -254,6 +254,21 @@
             "fullUrl": "https://cdn.ace-radom.io/photography/2026-06/DSC_0309_cut_fin_1x_ci.jpg",
             "lat": 48.126101,
             "lng": 8.226906
+        },
+        {
+            "id": 18,
+            "title": "法兰克福 城市电轨",
+            "country": "德国",
+            "state": "黑森",
+            "city": "美因河畔法兰克福",
+            "year": 2026,
+            "month": 6,
+            "day": 5,
+            "type": "normal",
+            "thumbUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC_0092_cut_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC_0092_cut_fin_1x_ci.jpg",
+            "lat": 50.103962,
+            "lng": 8.664999
         }
     ],
     "figure": [
