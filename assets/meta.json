@@ -262,13 +262,28 @@
             "state": "黑森",
             "city": "美因河畔法兰克福",
             "year": 2026,
-            "month": 6,
-            "day": 5,
+            "month": 7,
+            "day": 14,
             "type": "normal",
             "thumbUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC_0092_cut_fin_600px_c.jpg",
             "fullUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC_0092_cut_fin_1x_ci.jpg",
             "lat": 50.103962,
             "lng": 8.664999
+        },
+        {
+            "id": 19,
+            "title": "林道港",
+            "country": "德国",
+            "state": "巴伐利亚",
+            "city": "博登湖畔林道",
+            "year": 2026,
+            "month": 7,
+            "day": 21,
+            "type": "normal",
+            "thumbUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03059_cut_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03059_cut_fin_1x_ci.jpg",
+            "lat": 47.543981,
+            "lng": 9.682344
         }
     ],
     "figure": [
