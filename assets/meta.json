@@ -284,6 +284,36 @@
             "fullUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03059_cut_fin_1x_ci.jpg",
             "lat": 47.543981,
             "lng": 9.682344
+        },
+        {
+            "id": 20,
+            "title": "科尔马 小威尼斯",
+            "country": "法国",
+            "state": "大东部大区",
+            "city": "科尔马",
+            "year": 2026,
+            "month": 7,
+            "day": 24,
+            "type": "normal",
+            "thumbUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03115_cut_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03115_cut_fin_1x_ci.jpg",
+            "lat": 48.074631,
+            "lng": 7.360288
+        },
+        {
+            "id": 21,
+            "title": "黑林山区 暮行",
+            "country": "德国",
+            "state": "巴伐利亚",
+            "city": "博登湖畔林道",
+            "year": 2026,
+            "month": 7,
+            "day": 24,
+            "type": "normal",
+            "thumbUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03162_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03162_fin_1x_ci.jpg",
+            "lat": 47.991190,
+            "lng": 8.165242
         }
     ],
     "figure": [
