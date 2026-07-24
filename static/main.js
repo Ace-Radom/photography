@@ -112,8 +112,7 @@ function handleLandscapePhotoFocus(photo) {
 
     if (inBounds && isZoomedInEnough) {
         const inSafeBounds = safeBounds.contains(targetLatLng)
-        if (inSafeBounds)
-        {
+        if (inSafeBounds) {
             markers[photo.id].openTooltip();
             openImageModal(photo.fullUrl, photo.title);
             return;
@@ -361,18 +360,20 @@ async function initGallery() {
         const hpoiUrl = (isLocalDev) ? './assets/hpoi.json' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/hpoi.json';
         const compositeIconSvgUrl = (isLocalDev) ? './assets/icon-composite.svg' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/icon-composite.svg';
         const derivativeIconSvgUrl = (isLocalDev) ? './assets/icon-derivative.svg' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/icon-derivative.svg';
+        const groupIconSvgUrl = (isLocalDev) ? './assets/icon-group.svg' : 'https://raw.githubusercontent.com/Ace-Radom/photography/refs/heads/main/assets/icon-group.svg';
 
-        const [metaResponse, hpoiResponse, compositeIconSvgResponse, derivativeIconSvgResponse] = await Promise.all([
+        const [metaResponse, hpoiResponse, compositeIconSvgResponse, derivativeIconSvgResponse, groupIconSvgResponse] = await Promise.all([
             fetch(metaUrl),
             fetch(hpoiUrl),
             fetch(compositeIconSvgUrl),
-            fetch(derivativeIconSvgUrl)
+            fetch(derivativeIconSvgUrl),
+            fetch(groupIconSvgUrl)
         ]);
 
         if (!metaResponse.ok || !hpoiResponse.ok) {
             throw new Error(`数据获取失败，状态码: ${metaResponse.status}`);
         }
-        if (!compositeIconSvgResponse.ok || !derivativeIconSvgResponse.ok) {
+        if (!compositeIconSvgResponse.ok || !derivativeIconSvgResponse.ok || !groupIconSvgResponse.ok) {
             throw new Error(`图标获取失败，状态码: ${metaResponse.status}`);
         }
 
@@ -380,6 +381,7 @@ async function initGallery() {
         let hpoiData = await hpoiResponse.json();
         let compositeIconSvgString = await compositeIconSvgResponse.text();
         let derivativeIconSvgString = await derivativeIconSvgResponse.text();
+        let groupIconSvgString = await groupIconSvgResponse.text();
 
         // ============================
         // Init Landscape Photo Gallery
@@ -466,6 +468,13 @@ async function initGallery() {
                 </div>
                 `
             } // derivative work
+            else if (photo.type === 'group') {
+                tag = `
+                <div class="creative-indicator" data-tooltip="这幅作品与他人合作创作/由他人出镜">
+                    ${groupIconSvgString}
+                </div>
+                `
+            } // group work
             barDiv.innerHTML = `
                 <img src="${photo.thumbUrl}" alt="${photo.title}"> 
                 <div class="info">
@@ -556,6 +565,13 @@ async function initGallery() {
                 </div>
                 `
             } // derivative work
+            else if (photo.type === 'group') {
+                tag = `
+                <div class="creative-indicator" data-tooltip="这幅作品与他人合作创作/由他人出镜">
+                    ${groupIconSvgString}
+                </div>
+                `
+            } // group work
             barDiv.innerHTML = `
                 <img src="${photo.thumbUrl}" alt="${photo.title}"> 
                 <div class="info">
