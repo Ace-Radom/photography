@@ -6,6 +6,15 @@ import requests
 from pathlib import Path
 
 
+REMOVE_HYPERLINK_POLICY_STRICT = 0
+REMOVE_HYPERLINK_POLICY_MULTI = 1
+
+
+def remove_emptylines_in_text(text: str) -> str:
+    pattern = r"\n\s*"
+    return re.sub(pattern, "", text)
+
+
 def get_root_dir() -> Path:
     script_path = Path(__file__).resolve()
     current_dir = script_path.parent
@@ -21,6 +30,7 @@ def get_data_from_html(
     target_str_begin: str,
     target_str_end: str,
     with_possible_hyperlink: bool = False,
+    remove_hyperlink_policy: int = REMOVE_HYPERLINK_POLICY_MULTI,
 ) -> str:
     search_begin_pos = 0
     for anchor in anchors:
@@ -49,7 +59,16 @@ def get_data_from_html(
         return data_str
 
     pattern = r"<a\b[^>]*>(.*?)</a>"
-    return re.sub(pattern, r"\1", data_str, flags=re.DOTALL | re.IGNORECASE)
+
+    if remove_hyperlink_policy == REMOVE_HYPERLINK_POLICY_STRICT:
+        match = re.search(pattern, data_str, flags=re.DOTALL | re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        return data_str
+    elif remove_hyperlink_policy == REMOVE_HYPERLINK_POLICY_MULTI:
+        return remove_emptylines_in_text(
+            re.sub(pattern, r"\1", data_str, flags=re.DOTALL | re.IGNORECASE).strip()
+        )
 
 
 def extract_date_numbers(date_str: str) -> tuple[int, int, int]:
@@ -166,6 +185,7 @@ def main() -> None:
             target_str_begin="<p>",
             target_str_end="</p>",
             with_possible_hyperlink=True,
+            remove_hyperlink_policy=REMOVE_HYPERLINK_POLICY_STRICT,
         )
 
         series = get_data_from_html(
