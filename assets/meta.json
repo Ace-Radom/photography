@@ -340,6 +340,18 @@
             "thumbUrl": "https://cdn.ace-radom.io/figure/2026-02/DSC02785_cut_fin_600px_c.jpg",
             "fullUrl": "https://cdn.ace-radom.io/figure/2026-02/DSC02785_cut_fin_1x_ci.jpg",
             "hpoi-id": 107521
+        },
+        {
+            "id": 3,
+            "title": "GSC 空崎日奈（礼服）",
+            "title-original": "GSC ヒナ（ドレス）",
+            "year": 2026,
+            "month": 8,
+            "day": 20,
+            "type": "composite",
+            "thumbUrl": "https://cdn.ace-radom.io/figure/2026-08/DSC_5663_merged_cut_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/figure/2026-08/DSC_5663_merged_cut_fin_1x_ci.jpg",
+            "hpoi-id": 98748
         }
     ]
 }
