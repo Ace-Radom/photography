@@ -314,6 +314,51 @@
             "fullUrl": "https://cdn.ace-radom.io/photography/2026-07/DSC03162_fin_1x_ci.jpg",
             "lat": 47.991190,
             "lng": 8.165242
+        },
+        {
+            "id": 22,
+            "title": "爪木崎",
+            "country": "日本",
+            "state": "静冈县",
+            "city": "下田市",
+            "year": 2026,
+            "month": 8,
+            "day": 29,
+            "type": "normal",
+            "thumbUrl": "https://cdn.ace-radom.io/photography/2026-08/DSC_6734_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/photography/2026-08/DSC_6734_fin_1x_ci.jpg",
+            "lat": 34.661867,
+            "lng": 138.984872
+        },
+        {
+            "id": 23,
+            "title": "宇治公园",
+            "country": "日本",
+            "state": "京都府",
+            "city": "宇治市",
+            "year": 2026,
+            "month": 8,
+            "day": 31,
+            "type": "normal",
+            "thumbUrl": "https://cdn.ace-radom.io/photography/2026-08/DSC_7823_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/photography/2026-08/DSC_7823_fin_1x_ci.jpg",
+            "lat": 34.890381,
+            "lng": 135.807811
+        },
+        {
+            "id": 24,
+            "title": "大吉山 夜景",
+            "country": "日本",
+            "state": "京都府",
+            "city": "宇治市",
+            "year": 2026,
+            "month": 8,
+            "day": 31,
+            "type": "normal",
+            "thumbUrl": "https://cdn.ace-radom.io/photography/2026-08/DSC_4316_nc_fin_600px_c.jpg",
+            "fullUrl": "https://cdn.ace-radom.io/photography/2026-08/DSC_4316_nc_fin_1x_ci.jpg",
+            "lat": 34.892972,
+            "lng": 135.812886
         }
     ],
     "figure": [
@@ -344,7 +389,7 @@
         {
             "id": 3,
             "title": "GSC 空崎日奈（礼服）",
-            "title-original": "GSC ヒナ（ドレス）",
+            "title-original": "ヒナ（ドレス）",
             "year": 2026,
             "month": 8,
             "day": 20,
